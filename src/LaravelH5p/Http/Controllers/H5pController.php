@@ -273,6 +273,8 @@ class H5pController extends Controller
         $settings = $embed['settings'];
         $title = $content['title'];
 
+        $user = Auth::user();
+
         // create event dispatch
         event(new H5pEvent('content', null, $content['id'], $content['title'], $content['library']['name'], $content['library']['majorVersion'], $content['library']['minorVersion']));
 

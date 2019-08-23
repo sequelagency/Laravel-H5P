@@ -56,6 +56,8 @@ class LibraryController extends Controller
         } else {
             $settings['libraryList']['notCached'] = 0;
         }
+        
+        $hubOn = null;
 
         return view('h5p.library.index', compact('entrys', 'settings', 'last_update', 'hubOn', 'required_files'));
     }
