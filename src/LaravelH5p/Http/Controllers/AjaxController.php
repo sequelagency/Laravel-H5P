@@ -22,7 +22,7 @@ class AjaxController extends Controller
         $editor = $h5p::$h5peditor;
 
         if ($machineName) {
-            $editor->ajax->action(H5PEditorEndpoints::SINGLE_LIBRARY, $machineName, $major_version, $minor_version, $h5p->get_language(), '', $h5p->get_h5plibrary_url('', true));
+            $editor->ajax->action(H5PEditorEndpoints::SINGLE_LIBRARY, $machineName, $major_version, $minor_version, $h5p->get_language(), '', $h5p->get_h5plibrary_url('', true), '');
             // Log library load
             event(new H5pEvent('library', null, null, null, $machineName, $major_version.'.'.$minor_version));
         } else {

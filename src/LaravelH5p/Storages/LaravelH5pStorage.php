@@ -341,12 +341,12 @@ class LaravelH5pStorage implements H5PFileStorage
         // Add filename to path
         $path .= '/'.$file->getName();
 
-        $fileData = $file->getData();
+        /*$fileData = $file->getData();
         if ($fileData) {
             file_put_contents($path, $fileData);
-        } else {
+        } else {*/
             copy($_FILES['file']['tmp_name'], $path);
-        }
+        //}
 
         return $file;
     }
@@ -580,14 +580,23 @@ class LaravelH5pStorage implements H5PFileStorage
     }
 
     /**
-   * Store the given stream into the given file.
-   *
-   * @param string $path
-   * @param string $file
-   * @param resource $stream
-   * @return bool
-   */
-  public function saveFileFromZip($path, $file, $stream){
-    return true;
-  }
+     * Store the given stream into the given file.
+     *
+     * @param string $path
+     * @param string $file
+     * @param resource $stream
+     * @return bool
+     */
+    public function saveFileFromZip($path, $file, $stream){
+        $filePath = $path . '/' . $file;
+        //dd($filePath);
+        // Make sure the directory exists first
+        $matches = array();
+        preg_match('/(.+)\/[^\/]*$/', $filePath, $matches);
+        //echo 'a';
+        self::dirReady($matches[1]);
+        //dd('b');
+        // Store in local storage folder
+        return file_put_contents($filePath, $stream);
+    }
 }
