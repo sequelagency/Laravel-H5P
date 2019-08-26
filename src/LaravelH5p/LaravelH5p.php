@@ -89,7 +89,7 @@ class LaravelH5p
     public static function get_url($path = '')
     {
          //return url('/assets/vendor'.$path);
-         return url('/storage/'.$path);
+         return url('/storage'.$path);
     }
 
     public static function get_h5p_storage($path = '', $absolute = false)
