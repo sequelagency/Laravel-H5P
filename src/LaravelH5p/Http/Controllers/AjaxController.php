@@ -82,4 +82,43 @@ class AjaxController extends Controller
     {
         return response()->json($request->all());
     }
+
+    public function dom(Request $request, $id = 0)
+    {
+        //dd('ici api h5p');
+        $h5p = App::make('LaravelH5p');
+        $core = $h5p::$core;
+
+        $user = \Auth::user();
+
+        $settings = $h5p::get_core();
+
+        //edition
+        if ($id > 0) {
+            $editor = $h5p::$h5peditor;
+
+            $content = $h5p->get_content($id);
+            $embed = $h5p->get_embed($content, $settings);
+            $embed_code = $embed['embed'];
+            $settings = $embed['settings'];
+        } else {
+            $content = null;
+            
+        }
+        
+        // Prepare form
+        $library = isset($content['library']) ? \H5PCore::libraryToString($content['library']) : 0;
+        $parameters = isset($content['params']) ? $content['params'] : '{}';
+        $display_options = $core->getDisplayOptionsForEdit(isset($content['disable']) ? $content['disable'] : null);
+
+        // view Get the file and settings to print from
+        $settings = $h5p::get_editor($content);
+
+        return [
+            'settings' => $settings,
+            'library' => $library,
+            'parameters' => $parameters,
+            'display_options' => $display_options,
+        ];
+    }
 }
