@@ -30,6 +30,7 @@ use H5peditor;
 use H5PExport;
 use H5PStorage;
 use H5PValidator;
+use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Auth;
 
 //H5P_Plugin

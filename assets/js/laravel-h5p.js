@@ -69,7 +69,7 @@
                     }
                 }
 
-                $(this).find('.btn').button('loading');
+                //$(this).find('.btn').button('loading');
             });
 
             // Title label
