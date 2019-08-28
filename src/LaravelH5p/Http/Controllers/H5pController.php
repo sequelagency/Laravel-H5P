@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Djoudi\LaravelH5p\Eloquents\H5pContent;
 use Djoudi\LaravelH5p\Events\H5pEvent;
 use Djoudi\LaravelH5p\LaravelH5p;
+use Djoudi\LaravelH5p\Exceptions\H5PException;
 use H5pCore;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\App;
@@ -60,7 +61,7 @@ class H5pController extends Controller
 
     public function store(Request $request)
     {
-        $h5p = App::make('LaravelH5p');
+        /*$h5p = App::make('LaravelH5p');
         $core = $h5p::$core;
         $editor = $h5p::$h5peditor;
 
@@ -144,6 +145,18 @@ class H5pController extends Controller
             return redirect()
                 ->route('h5p.create')
                 ->with('fail', trans('laravel-h5p.content.can_not_created'));
+        }*/
+
+        $return_id = LaravelH5p::controllerStore($request, $this);
+
+        if ($return_id) {
+            return redirect()
+                ->route('h5p.edit', $return_id)
+                ->with('success', trans('laravel-h5p.content.created'));
+        } else {
+            return redirect()
+                ->route('h5p.create')
+                ->with('fail', trans('laravel-h5p.content.can_not_created'));
         }
     }
 
@@ -177,7 +190,7 @@ class H5pController extends Controller
 
     public function update(Request $request, $id)
     {
-        $h5p = App::make('LaravelH5p');
+        /*$h5p = App::make('LaravelH5p');
         $core = $h5p::$core;
         $editor = $h5p::$h5peditor;
 
@@ -259,6 +272,18 @@ class H5pController extends Controller
             return redirect()
                 ->back()
                 ->with('fail', trans('laravel-h5p.content.can_not_updated'));
+        }*/
+
+        $return_id = LaravelH5p::controllerUpdate($request, $this, $id);
+
+        if ($return_id) {
+            return redirect()
+                ->route('h5p.edit', $return_id)
+                ->with('success', trans('laravel-h5p.content.updated'));
+        } else {
+            return redirect()
+                ->back()
+                ->with('fail', trans('laravel-h5p.content.can_not_updated'));
         }
     }
 
@@ -292,7 +317,7 @@ class H5pController extends Controller
         }
     }
 
-    private function get_disabled_content_features($core, &$content)
+    public static function get_disabled_content_features($core, &$content)
     {
         $set = [
             H5PCore::DISPLAY_OPTION_FRAME     => filter_input(INPUT_POST, 'frame', FILTER_VALIDATE_BOOLEAN),
@@ -303,7 +328,7 @@ class H5pController extends Controller
         $content['disable'] = $core->getStorableDisplayOptions($set, $content['disable']);
     }
 
-    private function handle_upload($content = null, $only_upgrade = null, $disable_h5p_security = false)
+    public static function handle_upload($content = null, $only_upgrade = null, $disable_h5p_security = false)
     {
         $h5p = App::make('LaravelH5p');
         $core = $h5p::$core;
