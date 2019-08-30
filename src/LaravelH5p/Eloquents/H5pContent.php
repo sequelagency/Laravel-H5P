@@ -25,6 +25,7 @@ class H5pContent extends Model
         'license',
         'keywords',
         'description',
+        'metadata',
     ];
 
     public function user()

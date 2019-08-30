@@ -29,6 +29,7 @@ class CreateH5pContentsTable extends Migration
             $table->string('license', 7)->nullable();
             $table->text('keywords', 65535)->nullable();
             $table->text('description', 65535)->nullable();
+            $table->text('metadata', 65535)->nullable();
         });
     }
 

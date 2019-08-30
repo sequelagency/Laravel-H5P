@@ -389,6 +389,7 @@ class LaravelH5pRepository implements H5PFrameworkInterface
         $content['slug'] = $entry['slug'];
         $content['library_id'] = $entry['library']['libraryId'];
         $content['parameters'] = $entry['params'];
+        $content['metadata'] = $entry['metadata'];
 
         if (!isset($entry['id'])) {
             $content['created_at'] = isset($entry['created_at']) ? $entry['created_at'] : Carbon::now();
@@ -596,6 +597,7 @@ class LaravelH5pRepository implements H5PFrameworkInterface
               , hc.user_id
               , hc.embed_type AS embedType
               , hc.disable
+              , hc.metadata
               , hl.id AS libraryId
               , hl.name AS libraryName
               , hl.major_version AS libraryMajorVersion
@@ -606,9 +608,15 @@ class LaravelH5pRepository implements H5PFrameworkInterface
         JOIN h5p_libraries hl ON hl.id = hc.library_id
         WHERE hc.id = ?', [$id]);
 
-        $return[0]->metadata = '';//TODO menchi
+        //$return[0]->metadata = '';//TODO menchi
 
-        return (array) array_shift($return);
+        $content = (array) array_shift($return);
+
+        if (isset($content['metadata'])) {
+            $content['metadata'] = json_decode($content['metadata']);
+        }
+
+        return $content;
     }
 
     /**

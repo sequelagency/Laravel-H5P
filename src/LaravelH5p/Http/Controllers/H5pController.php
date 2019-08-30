@@ -174,7 +174,11 @@ class H5pController extends Controller
 
         // Prepare form
         $library = $content['library'] ? H5PCore::libraryToString($content['library']) : 0;
-        $parameters = $content['params'] ? $content['params'] : '{}';
+        //$parameters = $content['params'] ? $content['params'] : '{}';
+            $parameters['params'] = json_decode($content['params']);
+            $parameters['metadata'] = $content['metadata'];
+            $parameters = \json_encode($parameters);
+
         $display_options = $core->getDisplayOptionsForEdit($content['disable']);
 
         // view Get the file and settings to print from
@@ -184,6 +188,17 @@ class H5pController extends Controller
         event(new H5pEvent('content', 'edit', $content['id'], $content['title'], $content['library']['name'], $content['library']['majorVersion'].'.'.$content['library']['minorVersion']));
 
         $user = Auth::user();
+
+
+        $h5p_content = [];
+        $h5p_content['settings'] = $settings;
+        $h5p_content['user'] = $user;
+        $h5p_content['content'] = $content;
+        $h5p_content['library'] = $library;
+        $h5p_content['parameters'] = $parameters;
+        $h5p_content['display_options'] = $display_options;
+
+        return response($h5p_content, 200);
 
         return view('h5p.content.edit', compact('settings', 'user', 'id', 'content', 'library', 'parameters', 'display_options'));
     }
@@ -302,6 +317,15 @@ class H5pController extends Controller
 
         // create event dispatch
         event(new H5pEvent('content', null, $content['id'], $content['title'], $content['library']['name'], $content['library']['majorVersion'], $content['library']['minorVersion']));
+
+        $h5p_content = [];
+        $h5p_content['settings'] = $settings;
+        $h5p_content['user'] = $user;
+        $h5p_content['embed_code'] = $embed_code;
+        $h5p_content['title'] = $title;
+        
+        return response($h5p_content, 200);
+
 
         //     return view('h5p.content.edit', compact("settings", 'user', 'id', 'content', 'library', 'parameters', 'display_options'));
         return view('h5p.content.show', compact('settings', 'user', 'embed_code', 'title'));

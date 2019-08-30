@@ -537,10 +537,14 @@ class LaravelH5p
                 
                 //new
                 $params = json_decode($request->get('parameters'));
-                $content['params'] = json_encode($params);
+                $content['params'] = json_encode($params->params);
                 if ($params === null) {
                     throw new H5PException('Invalid parameters');
                 }
+
+                $content['metadata'] = json_encode($params->metadata);
+
+                //$content['keywords'] = $params->metadata->title;
 
                 // Set disabled features
                 \Djoudi\LaravelH5p\Http\Controllers\H5pController::get_disabled_content_features($core, $content);
@@ -608,10 +612,14 @@ class LaravelH5p
                 
                 //new
                 $params = json_decode($request->get('parameters'));
-                $content['params'] = json_encode($params);
+                $content['params'] = json_encode($params->params);
                 if ($params === null) {
                     throw new H5PException('Invalid parameters');
                 }
+
+                $content['metadata'] = json_encode($params->metadata);
+
+                //$content['keywords'] = $params->metadata->title;
 
                 // Set disabled features
                 \Djoudi\LaravelH5p\Http\Controllers\H5pController::get_disabled_content_features($core, $content);
