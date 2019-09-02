@@ -100,5 +100,8 @@ return [
         'confirmDialogBody'     => 'Veuillez confirmer que vous souhaitez continuer. Cette action n\'est pas réversible.',
         'cancelLabel'           => 'Annuler',
         'confirmLabel'          => 'Confirmer',
+        'reuse'                 => 'Reuse',
+        'reuseDescription'      => 'Reuse this content',
+        'reuseContent'          => 'Reuse content',
     ],
 ];

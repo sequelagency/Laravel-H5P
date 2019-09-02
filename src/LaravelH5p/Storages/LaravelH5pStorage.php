@@ -458,7 +458,7 @@ class LaravelH5pStorage implements H5PFileStorage
     {
         $path = "{$this->path}/content/{$contentId}/{$file}";
         if (file_exists($path)) {
-            unlink($path);
+             //unlink($path);//TODO à patcher : commenté Menchi, supprime les fichiers que l'on vient de rajouter dans le content...
         }
     }
 

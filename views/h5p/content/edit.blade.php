@@ -1,6 +1,8 @@
 @extends( config('laravel-h5p.layout') )
 
-
+@if(!isset($errors))
+@php $errors = collect();@endphp
+@endif
 @section( 'h5p' )
 <div class="container-fluid">
 

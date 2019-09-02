@@ -25,10 +25,10 @@ return [
     // Content screen setting
     'h5p_show_display_option'    => true,
     'h5p_frame'                  => true,
-    'h5p_export'                 => true,
-    'h5p_embed'                  => true,
+    'h5p_export'                 => false,
+    'h5p_embed'                  => false,
     'h5p_copyright'              => false,
-    'h5p_icon'                   => true,
+    'h5p_icon'                   => false,
     'h5p_track_user'             => false,
     'h5p_ext_communication'      => true,
     'h5p_save_content_state'     => false,
@@ -39,5 +39,5 @@ return [
     'h5p_content_type_cache_updated_at' => 0,
     'h5p_check_h5p_requirements'        => false,
     'h5p_hub_is_enabled'                => false,
-    'h5p_version'                       => '1.22.0',
+    'h5p_version'                       => '1.23.0',
 ];
