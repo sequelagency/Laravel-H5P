@@ -389,7 +389,7 @@ class LaravelH5pRepository implements H5PFrameworkInterface
         $content['slug'] = $entry['slug'];
         $content['library_id'] = $entry['library']['libraryId'];
         $content['parameters'] = $entry['params'];
-        $content['metadata'] = $entry['metadata'];
+        $content['metadata'] = isset($entry['metadata']) ? $entry['metadata'] : '';
 
         if (!isset($entry['id'])) {
             $content['created_at'] = isset($entry['created_at']) ? $entry['created_at'] : Carbon::now();

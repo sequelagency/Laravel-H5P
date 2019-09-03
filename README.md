@@ -16,7 +16,7 @@ composer require exatech-group/laravel-h5p
 Publish the Views, Config and so things.
 
 ```bash
-php artisan vendor:publish
+php artisan vendor:publish --provider=Djoudi\LaravelH5p\LaravelH5pServiceProvider
 ```
 
 Migrate the Database
@@ -25,8 +25,3 @@ Migrate the Database
 php artisan migrate
 ```
 
-```php
-'providers' => [
-    Djoudi\LaravelH5p\LaravelH5pServiceProvider::class,
-];
-```

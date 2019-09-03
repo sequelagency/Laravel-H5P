@@ -59,5 +59,9 @@ Route::prefix('api')->group(function () {
 
         Route::get('h5p/embed/{id}', 'Djoudi\LaravelH5p\Http\Controllers\EmbedController')->name('h5p.embed');
         Route::get('h5p/export/{id}', 'Djoudi\LaravelH5p\Http\Controllers\DownloadController')->name('h5p.export');
+
+        Route::group(['middleware' => 'auth:api'], function(){
+            Route::post('ajax/finish', 'Djoudi\LaravelH5p\Http\Controllers\AjaxController@finish')->name('h5p.ajax.finish');
+        });
     });
 });
