@@ -46,6 +46,7 @@
                     $upload.hide();
                     if (h5peditor === undefined) {
                         h5peditor = new ns.Editor(library, $params.val(), $editor[0]);
+                        ns.editorInstance = h5peditor;
                     }
                     $create.show();
                 }

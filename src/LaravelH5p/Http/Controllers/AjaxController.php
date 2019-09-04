@@ -174,34 +174,49 @@ class AjaxController extends Controller
 
         $user = \Auth::user();
 
-        $settings = $h5p::get_core();
+        
 
         //edition
         if ($id > 0) {
-            $editor = $h5p::$h5peditor;
-
+         
+            //$settings = $h5p::get_core();
+            
             $content = $h5p->get_content($id);
+            $settings = $h5p::get_editor($content);
             $embed = $h5p->get_embed($content, $settings);
             $embed_code = $embed['embed'];
             $settings = $embed['settings'];
+            $title = $content['title'];
+
+            $parameters['params'] = json_decode($content['params']);
+            $parameters['metadata'] = $content['metadata'];
+            $parameters = \json_encode($parameters);
         } else {
             $content = null;
+            $parameters = isset($content['params']) ? $content['params'] : '{}';
+            // view Get the file and settings to print from
             
+            $embed_code = '';
         }
         
         // Prepare form
         $library = isset($content['library']) ? \H5PCore::libraryToString($content['library']) : 0;
-        $parameters = isset($content['params']) ? $content['params'] : '{}';
         $display_options = $core->getDisplayOptionsForEdit(isset($content['disable']) ? $content['disable'] : null);
+        $title = isset($content['title']) ? $content['title'] : '';
 
-        // view Get the file and settings to print from
-        $settings = $h5p::get_editor($content);
+      
+       
 
         return [
             'settings' => $settings,
             'library' => $library,
             'parameters' => $parameters,
             'display_options' => $display_options,
+            'embed_code' => $embed_code,
+            'title' => $title,
+            'user' => [
+                'email' => $user->email
+            ]
         ];
     }
 }
