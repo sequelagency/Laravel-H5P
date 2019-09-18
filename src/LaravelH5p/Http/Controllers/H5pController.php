@@ -189,17 +189,7 @@ class H5pController extends Controller
 
         $user = Auth::user();
 
-
-        $h5p_content = [];
-        $h5p_content['settings'] = $settings;
-        $h5p_content['user'] = $user;
-        $h5p_content['content'] = $content;
-        $h5p_content['library'] = $library;
-        $h5p_content['parameters'] = $parameters;
-        $h5p_content['display_options'] = $display_options;
-
-        return response($h5p_content, 200);
-
+        
         return view('h5p.content.edit', compact('settings', 'user', 'id', 'content', 'library', 'parameters', 'display_options'));
     }
 
@@ -318,13 +308,6 @@ class H5pController extends Controller
         // create event dispatch
         event(new H5pEvent('content', null, $content['id'], $content['title'], $content['library']['name'], $content['library']['majorVersion'], $content['library']['minorVersion']));
 
-        $h5p_content = [];
-        $h5p_content['settings'] = $settings;
-        $h5p_content['user'] = $user;
-        $h5p_content['embed_code'] = $embed_code;
-        $h5p_content['title'] = $title;
-        
-        return response($h5p_content, 200);
 
 
         //     return view('h5p.content.edit', compact("settings", 'user', 'id', 'content', 'library', 'parameters', 'display_options'));

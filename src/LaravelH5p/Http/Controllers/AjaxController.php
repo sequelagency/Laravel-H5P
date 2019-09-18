@@ -80,6 +80,17 @@ class AjaxController extends Controller
 
         if ((int)$user_id > 0) {
 
+            $referer = app('Illuminate\Routing\UrlGenerator')->previous();
+
+            //https://lmscc.test/data/formations/1/learningpaths/1/activityshow/1
+            $re = '/^(http[s]:\/\/)([^:\/\s]+)(\/data\/formations\/)(?P<formation_id>[\d]+)(\/learningpaths\/)(?P<learningpath_id>[\d]+)(\/activityshow\/)(?P<activity_id>[\d]+)([\D]*)$/m';
+
+            $find = preg_match_all($re, $referer, $matches, PREG_SET_ORDER, 0);
+
+            $formation_id = isset($matches[0]['formation_id']) ? $matches[0]['formation_id'] : 0;
+            $learningpath_id = isset($matches[0]['learningpath_id']) ? $matches[0]['learningpath_id'] : 0;
+            $activity_id = isset($matches[0]['activity_id']) ? $matches[0]['activity_id'] : 0;
+
 
             $h5p_url = $request->input('object.id');
             $url_parts = explode('/', $h5p_url);//"http://lmscc.test/api/h5p/embed/13?subContentId=564bbacf-c83a-4511-9831-d8a4af1305eb"
@@ -109,7 +120,10 @@ class AjaxController extends Controller
                 'description' => $request->has('object.definition.description') ? json_encode($request->input('object.definition.description')) : ($request->has('object.definition.name') ? json_encode($request->input('object.definition.name') ): null),
                 'correct_responses_pattern' => $request->has('object.definition.correctResponsesPattern') ? json_encode($request->input('object.definition.correctResponsesPattern')) : null,
                 'response' => $request->has('result.response') ? json_encode($request->input('result.response')) : null,
-                'additionals' => $request->has('object.definition.choices') ? json_encode($request->input('object.definition.choices')) : null
+                'additionals' => $request->has('object.definition.choices') ? json_encode($request->input('object.definition.choices')) : null,
+                'formation_id' => $activity_id,
+                'learningpath_id' => $learningpath_id,
+                'activity_id' => $activity_id
             ];
 
             if ($previous_result) {//maj
@@ -122,6 +136,10 @@ class AjaxController extends Controller
                         $contents = \Djoudi\LaravelH5p\Eloquents\H5pResult::where('content_id', $h5p_id)->whereNotNull('subcontent_id')->where('user_id', $user_id)->get();
 
                         $data = [];//donnée pour maj parent
+                        $data['content_id'] = $h5p_id;
+                        $data['formation_id'] = $activity_id;
+                        $data['learningpath_id'] = $learningpath_id;
+                        $data['activity_id'] = $activity_id;
                         $data['score'] = 0;
                         $data['max_score'] = 0;
                         $data['finished'] = null;
@@ -145,12 +163,25 @@ class AjaxController extends Controller
                         }
     
                         $parent->update($data);
+                         if ($data['finished'] != -1 && $data['finished'] != null) {
+                            event(new \Djoudi\LaravelH5p\Events\H5pResultEvent('result', 'finished', $data));
+                         }
+                    }
+                } else {
+                    if($result['finished'] != null){
+                        event(new \Djoudi\LaravelH5p\Events\H5pResultEvent('result', 'finished', $result));
                     }
                 }
             } else {
                 \Djoudi\LaravelH5p\Eloquents\H5pResult::create($result);
+                if($result['finished'] != null){
+                    event(new \Djoudi\LaravelH5p\Events\H5pResultEvent('result', 'finished', $result));
+                }
+                
             }
 
+
+            //event(new \Djoudi\LaravelH5p\Events\H5pResultEvent('test', 'debug', $result));
             
 
         } else {
@@ -163,7 +194,58 @@ class AjaxController extends Controller
 
     public function contentUserData(Request $request)
     {
-        return response()->json($request->all());
+        $user_id = \Auth::id();    
+        
+        // Query String Parameters.
+        $content_id = $request->content_id;
+        $data_type = $request->data_type;
+        $sub_content_id = $request->sub_content_id;
+
+        // Form Data.
+        $data = $request->data;
+        $preload = $request->preload;
+        $invalidate = $request->invalidate;
+
+        if ($data !== null && $preload !== null && $invalidate !== null) {
+            if ($data === '0') { // Delete user data.             
+                 \Djoudi\LaravelH5p\Eloquents\H5pContentsUserData::where('content_id', $content_id)
+                ->where('user_id', $user_id)
+                ->where('sub_content_id', $sub_content_id)
+                ->where('data_id', $data_type)
+                ->delete();
+
+            } else { //create/update data
+                $contentUserData = \Djoudi\LaravelH5p\Eloquents\H5pContentsUserData::updateOrCreate([
+                    'content_id' => $content_id,
+                    'user_id' => $user_id,
+                    'sub_content_id' => $sub_content_id,
+                    'data_id' => $data_type
+                ],
+                [
+                    'data' => $data,
+                    'preload' => $preload,
+                    'invalidate' => $invalidate
+                ]);
+            }
+            
+        } else { //retrieve data        
+            $contentUserData = \Djoudi\LaravelH5p\Eloquents\H5pContentsUserData::where('content_id', $content_id)
+                ->where('user_id', $user_id)
+                ->where('sub_content_id', $sub_content_id)
+                ->where('data_id', $data_type)
+                ->first();
+        }
+    
+        $retour = [];
+        if ($contentUserData) {
+            $retour = [
+                'data' => $contentUserData->data,
+                'preload' => $contentUserData->preload,
+                'invalidate' => $contentUserData->invalidate,
+            ];
+        } 
+        
+        return response()->json($retour);
     }
 
     public function dom(Request $request, $id = 0)
@@ -192,6 +274,7 @@ class AjaxController extends Controller
             $parameters['metadata'] = $content['metadata'];
             $parameters = \json_encode($parameters);
         } else {
+            $settings = $h5p::get_editor();
             $content = null;
             $parameters = isset($content['params']) ? $content['params'] : '{}';
             // view Get the file and settings to print from
@@ -215,7 +298,8 @@ class AjaxController extends Controller
             'embed_code' => $embed_code,
             'title' => $title,
             'user' => [
-                'email' => $user->email
+                'mail' => $user->email,
+                'name' => $user->first_name.' '.$user->name
             ]
         ];
     }

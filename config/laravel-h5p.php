@@ -13,7 +13,7 @@
 return [
     'H5P_DEV'         => false,
     'language'        => 'en',
-    'domain'          => 'http://localhost',
+    'domain'          => env('APP_URL', 'http://localhost'),
     'h5p_public_path' => '/vendor',
     'slug'            => 'laravel-h5p',
     'views'           => 'h5p', // h5p view path

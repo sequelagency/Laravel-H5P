@@ -227,8 +227,8 @@ class LaravelH5p
             'postUserStatistics' => (config('laravel-h5p.h5p_track_user', true) === '1') && Auth::check(),
             'ajax'               => [
                 'setFinished'     => route('h5p.ajax.finish'),
-                'contentUserData' => route('h5p.ajax.content-user-data'),
-                // 'contentUserData' => route('h5p.ajax.content-user-data', ['content_id' => ':contentId', 'data_type' => ':dataType', 'sub_content_id' => ':subContentId']),
+                //'contentUserData' => route('h5p.ajax.content-user-data'),
+                 'contentUserData' => route('h5p.ajax.content-user-data').'?content_id=:contentId&data_type=:dataType&sub_content_id=:subContentId',
             ],
             'saveFreq' => config('laravel-h5p.h5p_save_content_state', false) ? config('laravel-h5p.h5p_save_content_frequency', 30) : false,
             'siteUrl'  => config('laravel-h5p.domain'),
@@ -240,7 +240,7 @@ class LaravelH5p
 
         if (Auth::check()) {
             $settings['user'] = [
-                'name' => Auth::user()->name,
+                'name' => Auth::user()->first_name.''.Auth::user()->name,
                 'mail' => Auth::user()->email,
             ];
         }

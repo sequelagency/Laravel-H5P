@@ -14,6 +14,7 @@ class CreateH5pContentsUserDataTable extends Migration
     public function up()
     {
         Schema::create('h5p_contents_user_data', function (Blueprint $table) {
+            $table->bigIncrements('id');
             $table->bigInteger('content_id')->unsigned();
             $table->bigInteger('user_id')->unsigned();
             $table->bigInteger('sub_content_id')->unsigned();
@@ -21,9 +22,8 @@ class CreateH5pContentsUserDataTable extends Migration
             $table->text('data');
             $table->boolean('preload')->default(0);
             $table->boolean('invalidate')->default(0);
-            $table->dateTime('updated_at')->default(DB::raw('CURRENT_TIMESTAMP'));
-            //			$table->dateTime('updated_at')->default('0000-00-00 00:00:00');
-            $table->primary(['content_id', 'user_id', 'sub_content_id', 'data_id'], 'fk_primary');
+            $table->timestamps();
+            $table->index(['content_id', 'user_id', 'sub_content_id', 'data_id'], 'content_user_sub_data');
         });
     }
 
