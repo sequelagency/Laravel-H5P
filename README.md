@@ -25,3 +25,16 @@ Migrate the Database
 php artisan migrate
 ```
 
+Sur linux
+```bash
+cd public/vendor/h5p
+ln -s ../../../storage/h5p/libraries
+ln -s ../../../storage/h5p/editor
+```
+Ou sur windows
+```cmd admin window
+cd public/vendor/h5p
+mklink /d libraries ..\..\..\storage\h5p\libraries
+mklink /d editor ..\..\..\storage\h5p\editor
+mklink /d content ..\..\..\storage\h5p\content
+```

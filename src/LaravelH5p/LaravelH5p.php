@@ -90,15 +90,15 @@ class LaravelH5p
 
     public static function get_url($path = '')
     {
-         //return url('/assets/vendor'.$path);
-         return url('/storage'.$path);
+        return url('/vendor'.$path);
+        //return url('/storage'.$path);
     }
 
     public static function get_h5p_storage($path = '', $absolute = false)
     {
         if ($absolute) {
-            //return new LaravelH5pStorage(storage_path('h5p'.$path));
-            return new LaravelH5pStorage(storage_path('app/public/h5p'.$path));
+            return new LaravelH5pStorage(storage_path('h5p'.$path));
+            //return new LaravelH5pStorage(storage_path('app/public/h5p'.$path));
         } else {
             return self::get_url('/h5p'.$path);
         }
