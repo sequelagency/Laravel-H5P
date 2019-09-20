@@ -95,7 +95,7 @@ class LaravelH5pServiceProvider extends \Illuminate\Support\ServiceProvider
             app_path('/../vendor/h5p/h5p-editor/ckeditor') => public_path('vendor/h5p/h5p-editor/ckeditor'),
             app_path('/../vendor/h5p/h5p-editor/images')   => public_path('vendor/h5p/h5p-editor/images'),
             app_path('/../vendor/h5p/h5p-editor/language') => public_path('vendor/h5p/h5p-editor/language'),
-            app_path('/../vendor/h5p/h5p-editor/libs')     => public_path('vendor/h5p/h5p-editorlibs'),
+            app_path('/../vendor/h5p/h5p-editor/libs')     => public_path('vendor/h5p/h5p-editor/libs'),
             app_path('/../vendor/h5p/h5p-editor/scripts')  => public_path('vendor/h5p/h5p-editor/scripts'),
             app_path('/../vendor/h5p/h5p-editor/styles')   => public_path('vendor/h5p/h5p-editor/styles'),
         ], 'public');

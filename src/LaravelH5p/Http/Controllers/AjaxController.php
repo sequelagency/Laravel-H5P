@@ -194,57 +194,60 @@ class AjaxController extends Controller
 
     public function contentUserData(Request $request)
     {
+        $retour = [];
+
         $user_id = \Auth::id();    
         
-        // Query String Parameters.
-        $content_id = $request->content_id;
-        $data_type = $request->data_type;
-        $sub_content_id = $request->sub_content_id;
+        if ((int)$user_id > 0) {
+            // Query String Parameters.
+            $content_id = $request->content_id;
+            $data_type = $request->data_type;
+            $sub_content_id = $request->sub_content_id;
 
-        // Form Data.
-        $data = $request->data;
-        $preload = $request->preload;
-        $invalidate = $request->invalidate;
+            // Form Data.
+            $data = $request->data;
+            $preload = $request->preload;
+            $invalidate = $request->invalidate;
 
-        if ($data !== null && $preload !== null && $invalidate !== null) {
-            if ($data === '0') { // Delete user data.             
-                 \Djoudi\LaravelH5p\Eloquents\H5pContentsUserData::where('content_id', $content_id)
-                ->where('user_id', $user_id)
-                ->where('sub_content_id', $sub_content_id)
-                ->where('data_id', $data_type)
-                ->delete();
+            if ($data !== null && $preload !== null && $invalidate !== null) {
+                if ($data === '0') { // Delete user data.             
+                    \Djoudi\LaravelH5p\Eloquents\H5pContentsUserData::where('content_id', $content_id)
+                    ->where('user_id', $user_id)
+                    ->where('sub_content_id', $sub_content_id)
+                    ->where('data_id', $data_type)
+                    ->delete();
 
-            } else { //create/update data
-                $contentUserData = \Djoudi\LaravelH5p\Eloquents\H5pContentsUserData::updateOrCreate([
-                    'content_id' => $content_id,
-                    'user_id' => $user_id,
-                    'sub_content_id' => $sub_content_id,
-                    'data_id' => $data_type
-                ],
-                [
-                    'data' => $data,
-                    'preload' => $preload,
-                    'invalidate' => $invalidate
-                ]);
+                } else { //create/update data
+                    $contentUserData = \Djoudi\LaravelH5p\Eloquents\H5pContentsUserData::updateOrCreate([
+                        'content_id' => $content_id,
+                        'user_id' => $user_id,
+                        'sub_content_id' => $sub_content_id,
+                        'data_id' => $data_type
+                    ],
+                    [
+                        'data' => $data,
+                        'preload' => $preload,
+                        'invalidate' => $invalidate
+                    ]);
+                }
+                
+            } else { //retrieve data        
+                $contentUserData = \Djoudi\LaravelH5p\Eloquents\H5pContentsUserData::where('content_id', $content_id)
+                    ->where('user_id', $user_id)
+                    ->where('sub_content_id', $sub_content_id)
+                    ->where('data_id', $data_type)
+                    ->first();
             }
-            
-        } else { //retrieve data        
-            $contentUserData = \Djoudi\LaravelH5p\Eloquents\H5pContentsUserData::where('content_id', $content_id)
-                ->where('user_id', $user_id)
-                ->where('sub_content_id', $sub_content_id)
-                ->where('data_id', $data_type)
-                ->first();
+
+            if ($contentUserData) {
+                $retour = [
+                    'data' => $contentUserData->data,
+                    'preload' => $contentUserData->preload,
+                    'invalidate' => $contentUserData->invalidate,
+                ];
+            } 
         }
-    
-        $retour = [];
-        if ($contentUserData) {
-            $retour = [
-                'data' => $contentUserData->data,
-                'preload' => $contentUserData->preload,
-                'invalidate' => $contentUserData->invalidate,
-            ];
-        } 
-        
+                
         return response()->json($retour);
     }
 
