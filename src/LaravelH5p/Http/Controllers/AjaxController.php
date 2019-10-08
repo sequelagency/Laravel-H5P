@@ -121,7 +121,7 @@ class AjaxController extends Controller
                 'correct_responses_pattern' => $request->has('object.definition.correctResponsesPattern') ? json_encode($request->input('object.definition.correctResponsesPattern')) : null,
                 'response' => $request->has('result.response') ? json_encode($request->input('result.response')) : null,
                 'additionals' => $request->has('object.definition.choices') ? json_encode($request->input('object.definition.choices')) : null,
-                'formation_id' => $activity_id,
+                'formation_id' => $formation_id,
                 'learningpath_id' => $learningpath_id,
                 'activity_id' => $activity_id
             ];
@@ -137,7 +137,7 @@ class AjaxController extends Controller
 
                         $data = [];//donnée pour maj parent
                         $data['content_id'] = $h5p_id;
-                        $data['formation_id'] = $activity_id;
+                        $data['formation_id'] = $formation_id;
                         $data['learningpath_id'] = $learningpath_id;
                         $data['activity_id'] = $activity_id;
                         $data['score'] = 0;
