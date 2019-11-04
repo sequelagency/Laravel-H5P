@@ -223,7 +223,7 @@ class LaravelH5p
     {
         $settings = [
             'baseUrl'            => config('laravel-h5p.domain'),
-            'url'                => self::get_h5p_storage(), // for uploaded
+            'url'                => config('laravel-h5p.domain').'/api/h5p_protect?'.(Auth::check() ? 'token='.auth()->tokenById(Auth::id()).'&' : '').'data=',//self::get_h5p_storage(), // for uploaded
             'postUserStatistics' => (config('laravel-h5p.h5p_track_user', true) === '1') && Auth::check(),
             'ajax'               => [
                 'setFinished'     => route('h5p.ajax.finish'),
@@ -240,7 +240,7 @@ class LaravelH5p
 
         if (Auth::check()) {
             $settings['user'] = [
-                'name' => Auth::user()->first_name.''.Auth::user()->name,
+                'name' => Auth::user()->first_name.' '.Auth::user()->name,
                 'mail' => Auth::user()->email,
             ];
         }

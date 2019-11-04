@@ -83,7 +83,7 @@ class AjaxController extends Controller
             $referer = app('Illuminate\Routing\UrlGenerator')->previous();
 
             //https://lmscc.test/data/formations/1/learningpaths/1/activityshow/1
-            $re = '/^(http[s]:\/\/)([^:\/\s]+)(\/data\/formations\/)(?P<formation_id>[\d]+)(\/learningpaths\/)(?P<learningpath_id>[\d]+)(\/activityshow\/)(?P<activity_id>[\d]+)([\D]*)$/m';
+            $re = '/^((http|https):\/\/)([^:\/\s]+)(\/data\/formations\/)(?P<formation_id>[\d]+)(\/learningpaths\/)(?P<learningpath_id>[\d]+)(\/activityshow\/)(?P<activity_id>[\d]+)([\D]*)$/m';
 
             $find = preg_match_all($re, $referer, $matches, PREG_SET_ORDER, 0);
 
