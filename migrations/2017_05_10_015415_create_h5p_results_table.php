@@ -17,7 +17,7 @@ class CreateH5pResultsTable extends Migration
             $table->bigIncrements('id');
             $table->timestamps();
             $table->bigInteger('content_id')->unsigned();
-            $table->bigInteger('subcontent_id')->unsigned();
+            $table->string('subcontent_id', 50)->nullable()->unsigned();
             $table->bigInteger('user_id')->unsigned();
             $table->bigInteger('score')->unsigned();
             $table->bigInteger('max_score')->unsigned();

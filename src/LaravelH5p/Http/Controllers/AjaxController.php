@@ -125,6 +125,11 @@ class AjaxController extends Controller
                 'learningpath_id' => $learningpath_id,
                 'activity_id' => $activity_id
             ];
+			
+			if((int)$result['time'] == 0){//ne pas reset le temps deja pris en compte
+				unset($result['time']);
+			}
+				
 
             if ($previous_result) {//maj
                 $previous_result->update($result);
