@@ -134,55 +134,55 @@ class AjaxController extends Controller
             if ($previous_result) {//maj
                 $previous_result->update($result);
 
-                //remontée sur le parent
-                if ($h5p_id_subc) {
-                    $parent = \Djoudi\LaravelH5p\Eloquents\H5pResult::where('content_id', $h5p_id)->whereNull('subcontent_id')->where('user_id', $user_id)->first();
-                    if ($parent) {
-                        $contents = \Djoudi\LaravelH5p\Eloquents\H5pResult::where('content_id', $h5p_id)->whereNotNull('subcontent_id')->where('user_id', $user_id)->get();
+                
+            } else {
+                $previous_result = \Djoudi\LaravelH5p\Eloquents\H5pResult::create($result);
+               
+                
+            }
 
-                        $data = [];//donnée pour maj parent
-                        $data['content_id'] = $h5p_id;
-                        $data['formation_id'] = $formation_id;
-                        $data['learningpath_id'] = $learningpath_id;
-                        $data['activity_id'] = $activity_id;
-                        $data['score'] = 0;
-                        $data['max_score'] = 0;
+            //remontée sur le parent
+            if ($h5p_id_subc) {
+                $parent = \Djoudi\LaravelH5p\Eloquents\H5pResult::firstOrCreate(['content_id' => $h5p_id, 'subcontent_id' => null, 'user_id' => $user_id], ['opened'=>now(), 'score'=>0, 'max_score'=>0]);
+                if ($parent) {
+                    $contents = \Djoudi\LaravelH5p\Eloquents\H5pResult::where('content_id', $h5p_id)->whereNotNull('subcontent_id')->where('user_id', $user_id)->get();
+
+                    $data = [];//donnée pour maj parent
+                    $data['content_id'] = $h5p_id;
+                    $data['formation_id'] = $formation_id;
+                    $data['learningpath_id'] = $learningpath_id;
+                    $data['activity_id'] = $activity_id;
+                    $data['score'] = 0;
+                    $data['max_score'] = 0;
+                    $data['finished'] = null;
+                    $data['time'] = 0;
+                    foreach ($contents as $content) {
+                        $data['score'] += $content->score;
+                        $data['max_score'] += $content->max_score;
+                        if ($content->finished && $data['finished'] != -1) {
+                            if ($data['finished'] == null || $data['finished'] < $content->finished) {
+                                $data['finished'] = $content->finished;
+                            }   
+                        } else {
+                            $data['finished'] = -1;
+                        }
+
+                        $data['time'] = max($data['time'], $content->time);
+                    }
+
+                    if ($data['finished'] == -1) {
                         $data['finished'] = null;
-                        $data['time'] = 0;
-                        foreach ($contents as $content) {
-                            $data['score'] += $content->score;
-                            $data['max_score'] += $content->max_score;
-                            if ($content->finished && $data['finished'] != -1) {
-                                if ($data['finished'] == null || $data['finished'] < $content->finished) {
-                                    $data['finished'] = $content->finished;
-                                }   
-                            } else {
-                                $data['finished'] = -1;
-                            }
-    
-                            $data['time'] = max($data['time'], $content->time);
-                        }
-    
-                        if ($data['finished'] == -1) {
-                            $data['finished'] = null;
-                        }
-    
-                        $parent->update($data);
-                         if ($data['finished'] != -1 && $data['finished'] != null) {
-                            event(new \Djoudi\LaravelH5p\Events\H5pResultEvent('result', 'finished', $data));
-                         }
                     }
-                } else {
-                    if($result['finished'] != null){
-                        event(new \Djoudi\LaravelH5p\Events\H5pResultEvent('result', 'finished', $result));
-                    }
+
+                    $parent->update($data);
+                     if ($data['finished'] != -1 && $data['finished'] != null) {
+                        event(new \Djoudi\LaravelH5p\Events\H5pResultEvent('result', 'finished', $data));
+                     }
                 }
             } else {
-                \Djoudi\LaravelH5p\Eloquents\H5pResult::create($result);
                 if($result['finished'] != null){
                     event(new \Djoudi\LaravelH5p\Events\H5pResultEvent('result', 'finished', $result));
                 }
-                
             }
 
 

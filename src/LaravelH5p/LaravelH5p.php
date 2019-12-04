@@ -226,7 +226,7 @@ class LaravelH5p
             'url'                => config('laravel-h5p.domain').'/api/h5p_protect?'.(Auth::check() ? 'token='.auth()->claims(['referer' => app('Illuminate\Routing\UrlGenerator')->previous()])->tokenById(Auth::id()).'&' : '').'data=',//self::get_h5p_storage(), // for uploaded
             'postUserStatistics' => (config('laravel-h5p.h5p_track_user', true) === '1') && Auth::check(),
             'ajax'               => [
-                'setFinished'     => route('h5p.ajax.finish').'?'.(Auth::check() ? 'token='.auth()->claims(['referer' => app('Illuminate\Routing\UrlGenerator')->previous()])->tokenById(Auth::id()) : ''),
+                'setFinished'     => route('h5p.ajax.finish').(Auth::check() ? '?token='.auth()->claims(['referer' => app('Illuminate\Routing\UrlGenerator')->previous()])->tokenById(Auth::id()) : ''),
                 //'contentUserData' => route('h5p.ajax.content-user-data'),
                  'contentUserData' => route('h5p.ajax.content-user-data').'?content_id=:contentId&data_type=:dataType&sub_content_id=:subContentId',
             ],

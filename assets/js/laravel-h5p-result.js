@@ -15,7 +15,7 @@
         
                 //if(idCurrent_split[0] == idParent || idParent == null){//on enregistre les event de l'activité ou des sous activités, mais pas des sous-sousactivités...
                     
-                    axios.post('/ajax/finish', event.data.statement)
+                    axios.post(H5PIntegration.ajax.setFinished, event.data.statement)
                     .then((response) => {
                         // handle success
                         console.log(response);
