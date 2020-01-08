@@ -498,152 +498,167 @@ class LaravelH5p
         return config('laravel-h5p.language');
     }
 
+    private static function isRequestOk($request){
+        if ( ($request->action == 'create' && $request->library != null) || ($request->action == 'upload' && $request->h5p_file != 'undefined')) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
     public static function controllerStore($request, $controller)
     {
-        $h5p = App::make('LaravelH5p');
-        $core = $h5p::$core;
-        $editor = $h5p::$h5peditor;
+        if (self::isRequestOk($request)) {
+            $h5p = App::make('LaravelH5p');
+            $core = $h5p::$core;
+            $editor = $h5p::$h5peditor;
 
-        $oldLibrary = null;
-        $oldParams = null;
-        $event_type = 'create';
-        $content = [
-            'disable'    => H5PCore::DISABLE_NONE,
-            'user_id'    => Auth::id(),
-            'title'      => $request->get('title'),
-            'embed_type' => 'div',
-            'filtered'   => '',
-            'slug'       => config('laravel-h5p.slug'),
-        ];
+            $oldLibrary = null;
+            $oldParams = null;
+            $event_type = 'create';
+            $content = [
+                'disable'    => H5PCore::DISABLE_NONE,
+                'user_id'    => Auth::id(),
+                'title'      => $request->get('title'),
+                'embed_type' => 'div',
+                'filtered'   => '',
+                'slug'       => config('laravel-h5p.slug'),
+            ];
 
-        $content['filtered'] = '';
+            $content['filtered'] = '';
 
-        try {
-            if ($request->get('action') === 'create') {
-                $content['library'] = $core->libraryFromString($request->get('library'));
-                if (!$content['library']) {
-                    throw new H5PException('Invalid library.');
+            try {
+                if ($request->get('action') === 'create') {
+                    $content['library'] = $core->libraryFromString($request->get('library'));
+                    if (!$content['library']) {
+                        throw new H5PException('Invalid library.');
+                    }
+
+                    // Check if library exists.
+                    $content['library']['libraryId'] = $core->h5pF->getLibraryId($content['library']['machineName'], $content['library']['majorVersion'], $content['library']['minorVersion']);
+                    if (!$content['library']['libraryId']) {
+                        throw new H5PException('No such library');
+                    }
+                    //old
+                // $content['params'] = $request->get('parameters');
+                // $params = json_decode($content['params']);
+                    
+                    
+                    //new
+                    $params = json_decode($request->get('parameters'));
+                    $content['params'] = json_encode($params->params);
+                    if ($params === null) {
+                        throw new H5PException('Invalid parameters');
+                    }
+
+                    $content['metadata'] = json_encode($params->metadata);
+
+                    //$content['keywords'] = $params->metadata->title;
+
+                    // Set disabled features
+                    \Djoudi\LaravelH5p\Http\Controllers\H5pController::get_disabled_content_features($core, $content);
+
+                    // Save new content
+                    $content['id'] = $core->saveContent($content);
+
+                    // Move images and find all content dependencies
+                    $editor->processParameters($content['id'], $content['library'], $params, $oldLibrary, $oldParams);
+
+                    event(new H5pEvent('content', $event_type, $content['id'], $content['title'], $content['library']['machineName'], $content['library']['majorVersion'], $content['library']['minorVersion']));
+
+                    $return_id = $content['id'];
+                } elseif ($request->get('action') === 'upload') {
+                    $content['uploaded'] = true;
+
+                    \Djoudi\LaravelH5p\Http\Controllers\H5pController::get_disabled_content_features($core, $content);
+
+                    // Handle file upload
+                    $return_id = \Djoudi\LaravelH5p\Http\Controllers\H5pController::handle_upload($content);
                 }
 
-                // Check if library exists.
-                $content['library']['libraryId'] = $core->h5pF->getLibraryId($content['library']['machineName'], $content['library']['majorVersion'], $content['library']['minorVersion']);
-                if (!$content['library']['libraryId']) {
-                    throw new H5PException('No such library');
-                }
-                //old
-               // $content['params'] = $request->get('parameters');
-               // $params = json_decode($content['params']);
-                
-                
-                //new
-                $params = json_decode($request->get('parameters'));
-                $content['params'] = json_encode($params->params);
-                if ($params === null) {
-                    throw new H5PException('Invalid parameters');
-                }
-
-                $content['metadata'] = json_encode($params->metadata);
-
-                //$content['keywords'] = $params->metadata->title;
-
-                // Set disabled features
-                \Djoudi\LaravelH5p\Http\Controllers\H5pController::get_disabled_content_features($core, $content);
-
-                // Save new content
-                $content['id'] = $core->saveContent($content);
-
-                // Move images and find all content dependencies
-                $editor->processParameters($content['id'], $content['library'], $params, $oldLibrary, $oldParams);
-
-                event(new H5pEvent('content', $event_type, $content['id'], $content['title'], $content['library']['machineName'], $content['library']['majorVersion'], $content['library']['minorVersion']));
-
-                $return_id = $content['id'];
-            } elseif ($request->get('action') === 'upload') {
-                $content['uploaded'] = true;
-
-                \Djoudi\LaravelH5p\Http\Controllers\H5pController::get_disabled_content_features($core, $content);
-
-                // Handle file upload
-                $return_id = \Djoudi\LaravelH5p\Http\Controllers\H5pController::handle_upload($content);
+                return $return_id;
+            } catch (H5PException $ex) {
+                return 0;
             }
-
-            return $return_id;
-        } catch (H5PException $ex) {
+        
+        } else {
             return 0;
         }
-
-        
     }
 
     public static function controllerUpdate($request, $controller, $id)
     {
-        $h5p = \App::make('LaravelH5p');
-        $core = $h5p::$core;
-        $editor = $h5p::$h5peditor;
+        if (self::isRequestOk($request)) {
+            $h5p = \App::make('LaravelH5p');
+            $core = $h5p::$core;
+            $editor = $h5p::$h5peditor;
 
-        $event_type = 'update';
-        $content = $h5p::get_content($id);
-        $content['embed_type'] = 'div';
-        $content['user_id'] = Auth::id();
-        $content['disable'] = $request->get('disable') ? $request->get('disable') : false;
-        $content['title'] = $request->get('title');
-        $content['filtered'] = '';
+            $event_type = 'update';
+            $content = $h5p::get_content($id);
+            $content['embed_type'] = 'div';
+            $content['user_id'] = Auth::id();
+            $content['disable'] = $request->get('disable') ? $request->get('disable') : false;
+            $content['title'] = $request->get('title');
+            $content['filtered'] = '';
 
-        $oldLibrary = $content['library'];
-        $oldParams = json_decode($content['params']);
+            $oldLibrary = $content['library'];
+            $oldParams = json_decode($content['params']);
 
-        try {
-            if ($request->get('action') === 'create') {
-                $content['library'] = $core->libraryFromString($request->get('library'));
-                if (!$content['library']) {
-                    throw new H5PException('Invalid library.');
+            try {
+                if ($request->get('action') === 'create') {
+                    $content['library'] = $core->libraryFromString($request->get('library'));
+                    if (!$content['library']) {
+                        throw new H5PException('Invalid library.');
+                    }
+
+                    // Check if library exists.
+                    $content['library']['libraryId'] = $core->h5pF->getLibraryId($content['library']['machineName'], $content['library']['majorVersion'], $content['library']['minorVersion']);
+                    if (!$content['library']['libraryId']) {
+                        throw new H5PException('No such library');
+                    }
+
+                    //                $content['parameters'] = $request->get('parameters');
+                    //old
+                    //$content['params'] = $request->get('parameters');
+                    //$params = json_decode($content['params']);
+                    
+                    //new
+                    $params = json_decode($request->get('parameters'));
+                    $content['params'] = json_encode($params->params);
+                    if ($params === null) {
+                        throw new H5PException('Invalid parameters');
+                    }
+
+                    $content['metadata'] = json_encode($params->metadata);
+
+                    //$content['keywords'] = $params->metadata->title;
+
+                    // Set disabled features
+                    \Djoudi\LaravelH5p\Http\Controllers\H5pController::get_disabled_content_features($core, $content);
+
+                    // Save new content
+                    $core->saveContent($content);
+
+                    // Move images and find all content dependencies
+                    $editor->processParameters($content['id'], $content['library'], $params, $oldLibrary, $oldParams);
+
+                    event(new H5pEvent('content', $event_type, $content['id'], $content['title'], $content['library']['machineName'], $content['library']['majorVersion'], $content['library']['minorVersion']));
+
+                    $return_id = $content['id'];
+                } elseif ($request->get('action') === 'upload') {
+                    $content['uploaded'] = true;
+
+                    \Djoudi\LaravelH5p\Http\Controllers\H5pController::get_disabled_content_features($core, $content);
+
+                    // Handle file upload
+                    $return_id = \Djoudi\LaravelH5p\Http\Controllers\H5pController::handle_upload($content);
                 }
 
-                // Check if library exists.
-                $content['library']['libraryId'] = $core->h5pF->getLibraryId($content['library']['machineName'], $content['library']['majorVersion'], $content['library']['minorVersion']);
-                if (!$content['library']['libraryId']) {
-                    throw new H5PException('No such library');
-                }
-
-                //                $content['parameters'] = $request->get('parameters');
-                //old
-                //$content['params'] = $request->get('parameters');
-                //$params = json_decode($content['params']);
-                
-                //new
-                $params = json_decode($request->get('parameters'));
-                $content['params'] = json_encode($params->params);
-                if ($params === null) {
-                    throw new H5PException('Invalid parameters');
-                }
-
-                $content['metadata'] = json_encode($params->metadata);
-
-                //$content['keywords'] = $params->metadata->title;
-
-                // Set disabled features
-                \Djoudi\LaravelH5p\Http\Controllers\H5pController::get_disabled_content_features($core, $content);
-
-                // Save new content
-                $core->saveContent($content);
-
-                // Move images and find all content dependencies
-                $editor->processParameters($content['id'], $content['library'], $params, $oldLibrary, $oldParams);
-
-                event(new H5pEvent('content', $event_type, $content['id'], $content['title'], $content['library']['machineName'], $content['library']['majorVersion'], $content['library']['minorVersion']));
-
-                $return_id = $content['id'];
-            } elseif ($request->get('action') === 'upload') {
-                $content['uploaded'] = true;
-
-                \Djoudi\LaravelH5p\Http\Controllers\H5pController::get_disabled_content_features($core, $content);
-
-                // Handle file upload
-                $return_id = \Djoudi\LaravelH5p\Http\Controllers\H5pController::handle_upload($content);
+                return $return_id;
+            } catch (H5PException $ex) {
+                return 0;
             }
-
-            return $return_id;
-        } catch (H5PException $ex) {
+        } else {
             return 0;
         }
     }
