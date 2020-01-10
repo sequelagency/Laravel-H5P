@@ -103,7 +103,7 @@ class AjaxController extends Controller
             $previous_result = \Djoudi\LaravelH5p\Eloquents\H5pResult::where('content_id', $h5p_id)->where('subcontent_id', $h5p_id_subc)->where('user_id', $user_id)->first();
 
             $finished = false;
-            if ($request->input('verb.id') == "http://adlnet.gov/expapi/verbs/answered") {
+            if ($request->input('verb.id') == "http://adlnet.gov/expapi/verbs/answered" || $request->input('verb.id') == "http://adlnet.gov/expapi/verbs/completed") {
                 $finished = true;
               
             }
@@ -123,7 +123,8 @@ class AjaxController extends Controller
                 'additionals' => $request->has('object.definition.choices') ? json_encode($request->input('object.definition.choices')) : null,
                 'formation_id' => $formation_id,
                 'learningpath_id' => $learningpath_id,
-                'activity_id' => $activity_id
+                'activity_id' => $activity_id,
+                'completion' => $finished ? 100 : 0
             ];
 			
 			if((int)$result['time'] == 0){//ne pas reset le temps deja pris en compte
@@ -156,9 +157,16 @@ class AjaxController extends Controller
                     $data['max_score'] = 0;
                     $data['finished'] = null;
                     $data['time'] = 0;
+                    $nbSubContent = 0;
+                    $nbSubContentComplete = 0;
                     foreach ($contents as $content) {
+                        $nbSubContent++;
                         $data['score'] += $content->score;
                         $data['max_score'] += $content->max_score;
+                        if ($content->finished) {
+                            $nbSubContentComplete++;
+                        }
+                        
                         if ($content->finished && $data['finished'] != -1) {
                             if ($data['finished'] == null || $data['finished'] < $content->finished) {
                                 $data['finished'] = $content->finished;
@@ -174,10 +182,19 @@ class AjaxController extends Controller
                         $data['finished'] = null;
                     }
 
+                    if($nbSubContent > 0){
+                        $data['completion'] = round($nbSubContentComplete / $nbSubContent * 100);
+                    } else if ($data['finished'] != null) {
+                        $data['completion'] = 100;
+                    } else {
+                        $data['completion'] = 0;
+                    }
+                   
+
                     $parent->update($data);
-                     if ($data['finished'] != -1 && $data['finished'] != null) {
+                    if ($data['finished'] != -1 && $data['finished'] != null) {
                         event(new \Djoudi\LaravelH5p\Events\H5pResultEvent('result', 'finished', $data));
-                     }
+                    }
                 }
             } else {
                 if($result['finished'] != null){
