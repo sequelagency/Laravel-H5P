@@ -79,18 +79,23 @@ class AjaxController extends Controller
         //dd($request);
 
         if ((int)$user_id > 0) {
+       
+           if ($request->has('f') && $request->has('l') && $request->has('a')) {//cas de l'app mobile qui est appelant
+                //'${Connexion.instance.urlBase}${Connexion.instance.urlH5P}/${act.h5pId}?l=${act.afll.learningpathId}&a=${act.id}&afll=${act.afll.id}&f=${act.afll.formationId}';          
+                $formation_id = $request->f;
+                $learningpath_id = $request->l;
+                $activity_id =  $request->a;
+            } else {//cas du client web browser               
+                //https://lmscc.test/data/formations/1/learningpaths/1/activityshow/1
+                $referer = app('Illuminate\Routing\UrlGenerator')->previous();
+                $re = '/^((http|https):\/\/)([^:\/\s]+)(\/data\/formations\/)(?P<formation_id>[\d]+)(\/learningpaths\/)(?P<learningpath_id>[\d]+)(\/activityshow\/)(?P<activity_id>[\d]+)([\D]*)$/m';
 
-            $referer = app('Illuminate\Routing\UrlGenerator')->previous();
+                $find = preg_match_all($re, $referer, $matches, PREG_SET_ORDER, 0);
 
-            //https://lmscc.test/data/formations/1/learningpaths/1/activityshow/1
-            $re = '/^((http|https):\/\/)([^:\/\s]+)(\/data\/formations\/)(?P<formation_id>[\d]+)(\/learningpaths\/)(?P<learningpath_id>[\d]+)(\/activityshow\/)(?P<activity_id>[\d]+)([\D]*)$/m';
-
-            $find = preg_match_all($re, $referer, $matches, PREG_SET_ORDER, 0);
-
-            $formation_id = isset($matches[0]['formation_id']) ? $matches[0]['formation_id'] : 0;
-            $learningpath_id = isset($matches[0]['learningpath_id']) ? $matches[0]['learningpath_id'] : 0;
-            $activity_id = isset($matches[0]['activity_id']) ? $matches[0]['activity_id'] : 0;
-
+                $formation_id = isset($matches[0]['formation_id']) ? $matches[0]['formation_id'] : 0;
+                $learningpath_id = isset($matches[0]['learningpath_id']) ? $matches[0]['learningpath_id'] : 0;
+                $activity_id = isset($matches[0]['activity_id']) ? $matches[0]['activity_id'] : 0;
+            }
 
             $h5p_url = $request->input('object.id');
             $url_parts = explode('/', $h5p_url);//"http://lmscc.test/api/h5p/embed/13?subContentId=564bbacf-c83a-4511-9831-d8a4af1305eb"
@@ -103,9 +108,13 @@ class AjaxController extends Controller
             $previous_result = \Djoudi\LaravelH5p\Eloquents\H5pResult::where('content_id', $h5p_id)->where('subcontent_id', $h5p_id_subc)->where('user_id', $user_id)->first();
 
             $finished = false;
-            if ($request->input('verb.id') == "http://adlnet.gov/expapi/verbs/answered" || $request->input('verb.id') == "http://adlnet.gov/expapi/verbs/completed") {
+            if (/*$request->input('verb.id') == "http://adlnet.gov/expapi/verbs/answered" ||*/ $request->input('verb.id') == "http://adlnet.gov/expapi/verbs/completed") {
                 $finished = true;
               
+            }
+
+            if ($request->input('result.completion') == 1){
+                $finished = true;
             }
 
             $result = [
@@ -192,9 +201,9 @@ class AjaxController extends Controller
                    
 
                     $parent->update($data);
-                    if ($data['finished'] != -1 && $data['finished'] != null) {
+                    //if ($data['finished'] != -1 && $data['finished'] != null) {
                         event(new \Djoudi\LaravelH5p\Events\H5pResultEvent('result', 'finished', $data));
-                    }
+                    //}
                 }
             } else {
                 if($result['finished'] != null){
