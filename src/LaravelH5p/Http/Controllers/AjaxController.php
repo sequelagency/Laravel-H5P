@@ -232,7 +232,7 @@ class AjaxController extends Controller
         if ((int)$user_id > 0) {
             // Query String Parameters.
             $content_id = $request->content_id;
-            $data_type = $request->data_type;
+            $data_type = strtolower($request->data_type);
             $sub_content_id = $request->sub_content_id;
 
             // Form Data.
@@ -272,9 +272,13 @@ class AjaxController extends Controller
 
             if ($contentUserData) {
                 $retour = [
-                    'data' => $contentUserData->data,
-                    'preload' => $contentUserData->preload,
-                    'invalidate' => $contentUserData->invalidate,
+                    'success' => 'success',
+                    //'data' => [
+                        'data' => $contentUserData->data,
+                        'preload' => $contentUserData->preload,
+                        'invalidate' => $contentUserData->invalidate,
+                    //]
+                              
                 ];
             } 
         }

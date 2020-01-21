@@ -228,7 +228,7 @@ class LaravelH5p
             'ajax'               => [
                 'setFinished'     => route('h5p.ajax.finish').(Auth::check() ? '?token='.auth()->claims(['referer' => app('Illuminate\Routing\UrlGenerator')->previous()])->tokenById(Auth::id()) : ''),
                 //'contentUserData' => route('h5p.ajax.content-user-data'),
-                 'contentUserData' => route('h5p.ajax.content-user-data').'?content_id=:contentId&data_type=:dataType&sub_content_id=:subContentId',
+                 'contentUserData' => route('h5p.ajax.content-user-data').'?content_id=:contentId&data_type=:dataType&sub_content_id=:subContentId'.(Auth::check() ? '&token='.auth()->claims(['referer' => app('Illuminate\Routing\UrlGenerator')->previous()])->tokenById(Auth::id()) : ''),
             ],
             'saveFreq' => config('laravel-h5p.h5p_save_content_state', false) ? config('laravel-h5p.h5p_save_content_frequency', 30) : false,
             'siteUrl'  => config('laravel-h5p.domain'),
