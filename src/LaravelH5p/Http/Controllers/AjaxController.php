@@ -151,8 +151,15 @@ class AjaxController extends Controller
                 
             }
 
+            $remonteeParent = false;
+            
+            if ($request->input('context.contextActivities.parent') && isset($request->input('context.contextActivities.parent')[0]['id']) && !\Illuminate\Support\Str::contains($request->input('context.contextActivities.parent')[0]['id'], 'subContentId')){
+                $remonteeParent = true;
+            }
+
+
             //remontée sur le parent
-            if ($h5p_id_subc) {
+            if ($h5p_id_subc && $remonteeParent) {
                 $parent = \Djoudi\LaravelH5p\Eloquents\H5pResult::firstOrCreate(['content_id' => $h5p_id, 'subcontent_id' => null, 'user_id' => $user_id], ['opened'=>now(), 'score'=>0, 'max_score'=>0]);
                 if ($parent) {
                     $contents = \Djoudi\LaravelH5p\Eloquents\H5pResult::where('content_id', $h5p_id)->whereNotNull('subcontent_id')->where('user_id', $user_id)->get();
