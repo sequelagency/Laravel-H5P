@@ -9,6 +9,8 @@ use H5PEditorEndpoints;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\App;
 
+use Illuminate\Support\Facades\Log;
+
 class AjaxController extends Controller
 {
     public function libraries(Request $request)
@@ -78,14 +80,19 @@ class AjaxController extends Controller
         $user_id = \Auth::id();
         //dd($request);
 
+        
+
         if ((int)$user_id > 0) {
        
-           if ($request->has('f') && $request->has('l') && $request->has('a')) {//cas de l'app mobile qui est appelant
+            if ($request->has('f') && $request->has('l') && $request->has('a')) {//cas de l'app mobile qui est appelant
+
                 //'${Connexion.instance.urlBase}${Connexion.instance.urlH5P}/${act.h5pId}?l=${act.afll.learningpathId}&a=${act.id}&afll=${act.afll.id}&f=${act.afll.formationId}';          
                 $formation_id = $request->f;
                 $learningpath_id = $request->l;
                 $activity_id =  $request->a;
-            } else {//cas du client web browser               
+
+                $client = 'mobile';
+            } else {//cas du client web browser                     
                 //https://lmscc.test/data/formations/1/learningpaths/1/activityshow/1
                 $referer = app('Illuminate\Routing\UrlGenerator')->previous();
                 $re = '/^((http|https):\/\/)([^:\/\s]+)(\/data\/formations\/)(?P<formation_id>[\d]+)(\/learningpaths\/)(?P<learningpath_id>[\d]+)(\/activityshow\/)(?P<activity_id>[\d]+)([\D]*)$/m';
@@ -95,7 +102,13 @@ class AjaxController extends Controller
                 $formation_id = isset($matches[0]['formation_id']) ? $matches[0]['formation_id'] : 0;
                 $learningpath_id = isset($matches[0]['learningpath_id']) ? $matches[0]['learningpath_id'] : 0;
                 $activity_id = isset($matches[0]['activity_id']) ? $matches[0]['activity_id'] : 0;
+
+                $client = 'browser';
             }
+
+            if($this->app->environment() !== 'production'){
+                Log::debug($client.'_'.$user_id.'_'.$formation_id.'_'.$learningpath_id.'_'.$activity_id.'_');
+            } 
 
             $h5p_url = $request->input('object.id');
             $url_parts = explode('/', $h5p_url);//"http://lmscc.test/api/h5p/embed/13?subContentId=564bbacf-c83a-4511-9831-d8a4af1305eb"
