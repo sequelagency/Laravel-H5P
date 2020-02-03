@@ -83,18 +83,24 @@ class AjaxController extends Controller
         
 
         if ((int)$user_id > 0) {
-       
-            if ($request->has('f') && $request->has('l') && $request->has('a')) {//cas de l'app mobile qui est appelant
 
-                //'${Connexion.instance.urlBase}${Connexion.instance.urlH5P}/${act.h5pId}?l=${act.afll.learningpathId}&a=${act.id}&afll=${act.afll.id}&f=${act.afll.formationId}';          
-                $formation_id = $request->f;
-                $learningpath_id = $request->l;
-                $activity_id =  $request->a;
+            $referer = app('Illuminate\Routing\UrlGenerator')->previous();
+
+            //test si appel depuis mobile
+            //'${Connexion.instance.urlBase}${Connexion.instance.urlH5P}/${act.h5pId}?l=${act.afll.learningpathId}&a=${act.id}&afll=${act.afll.id}&f=${act.afll.formationId}';          
+            $re = '/^((http|https):\/\/)([^:\/\s]+)(\/api\/h5p\/(?P<h5p_id>[\d]+)\?l=)(?P<learningpath_id>[\d]+)(\&a=)(?P<activity_id>[\d]+)(\&afll=)(?P<afll_id>[\d]+)(\&f=)(?P<formation_id>[\d]+)([\D]*)$/m';
+            $find = preg_match_all($re, $referer, $matches, PREG_SET_ORDER, 0);
+
+            if ($find !== false && $find > 0) {//cas de l'app mobile qui est appelant
+
+                $formation_id = isset($matches[0]['formation_id']) ? $matches[0]['formation_id'] : 0;
+                $learningpath_id = isset($matches[0]['learningpath_id']) ? $matches[0]['learningpath_id'] : 0;
+                $activity_id = isset($matches[0]['activity_id']) ? $matches[0]['activity_id'] : 0;
 
                 $client = 'mobile';
             } else {//cas du client web browser                     
                 //https://lmscc.test/data/formations/1/learningpaths/1/activityshow/1
-                $referer = app('Illuminate\Routing\UrlGenerator')->previous();
+               
                 $re = '/^((http|https):\/\/)([^:\/\s]+)(\/data\/formations\/)(?P<formation_id>[\d]+)(\/learningpaths\/)(?P<learningpath_id>[\d]+)(\/activityshow\/)(?P<activity_id>[\d]+)([\D]*)$/m';
 
                 $find = preg_match_all($re, $referer, $matches, PREG_SET_ORDER, 0);
