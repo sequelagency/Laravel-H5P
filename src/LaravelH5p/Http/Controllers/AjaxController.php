@@ -106,7 +106,7 @@ class AjaxController extends Controller
                 $client = 'browser';
             }
 
-            if($this->app->environment() !== 'production'){
+            if(config('app.env') !== 'production'){
                 Log::debug($client.'_'.$user_id.'_'.$formation_id.'_'.$learningpath_id.'_'.$activity_id.'_');
             } 
 
