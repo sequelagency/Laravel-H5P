@@ -88,14 +88,38 @@ class AjaxController extends Controller
 
             //test si appel depuis mobile
             //'${Connexion.instance.urlBase}${Connexion.instance.urlH5P}/${act.h5pId}?l=${act.afll.learningpathId}&a=${act.id}&afll=${act.afll.id}&f=${act.afll.formationId}';          
-            $re = '/^((http|https):\/\/)([^:\/\s]+)(\/api\/h5p\/(?P<h5p_id>[\d]+)\?l=)(?P<learningpath_id>[\d]+)(\&a=)(?P<activity_id>[\d]+)(\&afll=)(?P<afll_id>[\d]+)(\&f=)(?P<formation_id>[\d]+)([\D]*)$/m';
+            //$re = '/^((http|https):\/\/)([^:\/\s]+)(\/api\/h5p\/(?P<h5p_id>[\d]+)\?l=)(?P<learningpath_id>[\d]+)(\&a=)(?P<activity_id>[\d]+)(\&afll=)(?P<afll_id>[\d]+)(\&f=)(?P<formation_id>[\d]+)([\D]*)$/m';
+            $re = '/^((http|https):\/\/)([^:\/\s]+)(\/api\/h5p\/(?P<h5p_id>[\d]+)\?)([\D]*)$/m';
             $find = preg_match_all($re, $referer, $matches, PREG_SET_ORDER, 0);
 
             if ($find !== false && $find > 0) {//cas de l'app mobile qui est appelant
 
-                $formation_id = isset($matches[0]['formation_id']) ? $matches[0]['formation_id'] : 0;
-                $learningpath_id = isset($matches[0]['learningpath_id']) ? $matches[0]['learningpath_id'] : 0;
-                $activity_id = isset($matches[0]['activity_id']) ? $matches[0]['activity_id'] : 0;
+                $parts = explode('?', $referer);
+
+                if(isset($parts[1])){
+
+                    $paires = explode('&', $parts[1]);
+
+                    foreach($paires as $paire){
+                        
+                        list($prop, $value) = explode('=', $paire);
+
+                        switch($prop){
+                            case 'formation_id':
+                            case 'f':
+                                $formation_id = $value;
+                                break;
+                            case 'learningpath_id':
+                            case 'l':
+                                $learningpath_id = $value;
+                                break;
+                            case 'activity_id':
+                            case 'a':
+                                $activity_id = $value;
+                                break;
+                        }
+                    }
+                }
 
                 $client = 'mobile';
             } else {//cas du client web browser                     
