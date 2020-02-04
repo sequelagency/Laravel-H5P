@@ -401,6 +401,7 @@ class LaravelH5pRepository implements H5PFrameworkInterface
         } else {
             $content['id'] = $entry['id'];
             $content['updated_at'] = isset($entry['updated_at']) ? $entry['updated_at'] : Carbon::now();
+            unset($content['metadata']);
 
             H5pContent::where('id', $content['id'])->update($content);
             $event_type = 'update';
