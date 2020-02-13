@@ -141,7 +141,7 @@ class AjaxController extends Controller
             }
 
             if(config('app.env') !== 'production'){
-                Log::debug($client.'_'.$user_id.'_'.$formation_id.'_'.$learningpath_id.'_'.$activity_id.'_');
+                //Log::debug($client.'_'.$user_id.'_'.$formation_id.'_'.$learningpath_id.'_'.$activity_id.'_');
             } 
 
             $h5p_url = $request->input('object.id');
@@ -202,6 +202,22 @@ class AjaxController extends Controller
             
             if ($request->input('context.contextActivities.parent') && isset($request->input('context.contextActivities.parent')[0]['id']) && !\Illuminate\Support\Str::contains($request->input('context.contextActivities.parent')[0]['id'], 'subContentId')){
                 $remonteeParent = true;
+
+                if($request->input('verb.id') == "http://adlnet.gov/expapi/verbs/attempted"){
+                    //on parcourt le content.json, pour trouver les childs et peupler les results vierges
+                    $contents = \Illuminate\Support\Facades\Storage::disk('h5p')->get('content/'.$h5p_id.'/content.json');
+                    $json = json_decode($contents);
+                    if(isset($json->interactiveVideo)){
+                        foreach($json->interactiveVideo->assets->interactions as $interaction){
+                            if($interaction->libraryTitle == 'Multiple Choice'){
+                                $interaction->action->subContentId;
+
+                                $child = \Djoudi\LaravelH5p\Eloquents\H5pResult::firstOrCreate(['content_id' => $h5p_id, 'subcontent_id' => $interaction->action->subContentId, 'user_id' => $user_id], ['opened'=>now(), 'score'=>0, 'max_score'=>0]);
+                            }
+                        }
+                    }
+                }
+                
             }
 
 
