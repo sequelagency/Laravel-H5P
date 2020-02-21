@@ -10,6 +10,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\App;
 
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Str;
 
 class AjaxController extends Controller
 {
@@ -205,20 +206,63 @@ class AjaxController extends Controller
 
                 if($request->input('verb.id') == "http://adlnet.gov/expapi/verbs/attempted"){
                     //on parcourt le content.json, pour trouver les childs et peupler les results vierges
-                    $contents = \Illuminate\Support\Facades\Storage::disk('h5p')->get('content/'.$h5p_id.'/content.json');
-                    $json = json_decode($contents);
-                    if(isset($json->interactiveVideo)){
-                        foreach($json->interactiveVideo->assets->interactions as $interaction){
-                            if($interaction->libraryTitle == 'Multiple Choice'){
-                                $interaction->action->subContentId;
+                    $exists = \Illuminate\Support\Facades\Storage::disk('h5p')->exists('content/'.$h5p_id.'/content.json');
+                    if($exists){
+                        $contents = \Illuminate\Support\Facades\Storage::disk('h5p')->get('content/'.$h5p_id.'/content.json');
+                        $json = json_decode($contents);
+                        if(isset($json->interactiveVideo)){
+                            foreach($json->interactiveVideo->assets->interactions as $interaction){
+                                if($interaction->libraryTitle == 'Multiple Choice'){
+                                    $interaction->action->subContentId;
+    
+                                    $child = \Djoudi\LaravelH5p\Eloquents\H5pResult::firstOrCreate(['content_id' => $h5p_id, 'subcontent_id' => $interaction->action->subContentId, 'user_id' => $user_id], ['opened'=>now(), 'score'=>0, 'max_score'=>1]);
+                                }
+                            }
+                        }
+                    }
+                   
 
-                                $child = \Djoudi\LaravelH5p\Eloquents\H5pResult::firstOrCreate(['content_id' => $h5p_id, 'subcontent_id' => $interaction->action->subContentId, 'user_id' => $user_id], ['opened'=>now(), 'score'=>0, 'max_score'=>0]);
+                }
+                
+            } else {
+                $remonteeParent = true;
+                if($request->input('verb.id') == "http://adlnet.gov/expapi/verbs/answered"){
+                    //on parcourt le content.json, pour trouver les childs et peupler les results vierges
+                    $exists = \Illuminate\Support\Facades\Storage::disk('h5p')->exists('content/'.$h5p_id.'/content.json');
+                    if($exists){
+                        $contents = \Illuminate\Support\Facades\Storage::disk('h5p')->get('content/'.$h5p_id.'/content.json');
+                        $json = json_decode($contents);
+
+                        if(isset($json->presentation->slides)){
+                            foreach($json->presentation->slides as $slide){
+                                foreach($slide->elements as $element){
+                                    if( Str::startsWith($element->action->library, 'H5P.SingleChoiceSet')){
+                                        foreach($element->action->params->choices as $choice){
+                                            $choice->subContentId;
+                                            $child = \Djoudi\LaravelH5p\Eloquents\H5pResult::firstOrCreate(['content_id' => $h5p_id, 'subcontent_id' => $choice->subContentId, 'user_id' => $user_id], ['opened'=>now(), 'score'=>0, 'max_score'=>1]);
+                        
+                                        }
+                                    }
+
+                                }
+                            }
+                        }
+
+                        if(isset($json->content)){
+                            foreach($json->content as $content){
+                                if (Str::startsWith($content->content->library, 'H5P.SingleChoiceSet')){
+                                    foreach($content->content->params->choices as $choice){
+                                        $choice->subContentId;
+                                        $child = \Djoudi\LaravelH5p\Eloquents\H5pResult::firstOrCreate(['content_id' => $h5p_id, 'subcontent_id' => $choice->subContentId, 'user_id' => $user_id], ['opened'=>now(), 'score'=>0, 'max_score'=>1]);
+                    
+                                    }
+                                }
                             }
                         }
                     }
                 }
-                
             }
+
 
 
             //remontée sur le parent
