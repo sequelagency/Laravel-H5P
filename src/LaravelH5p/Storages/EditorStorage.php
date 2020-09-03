@@ -32,7 +32,7 @@ class EditorStorage implements H5peditorStorage
     }
 
     public function getAvailableLanguages($machineName, $majorVersion, $minorVersion){
-        return ['en'];
+        return ['en', 'fr'];
     }
 
     public function getLanguage($machineName, $majorVersion, $minorVersion, $language)

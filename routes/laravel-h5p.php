@@ -56,6 +56,7 @@ Route::prefix('api')->group(function () {
         Route::get('ajax/finish', 'Djoudi\LaravelH5p\Http\Controllers\AjaxController@finish')->name('h5p.ajax.finish');
         Route::post('ajax/content-user-data', 'Djoudi\LaravelH5p\Http\Controllers\AjaxController@contentUserData')->name('h5p.ajax.content-user-data');
         Route::get('ajax/content-user-data', 'Djoudi\LaravelH5p\Http\Controllers\AjaxController@contentUserData')->name('h5p.ajax.content-user-data');
+        Route::post('ajax/translations', 'Djoudi\LaravelH5p\Http\Controllers\AjaxController@getTranslations')->name('h5p.ajax.translation');
 
         Route::get('h5p/embed/{id}', 'Djoudi\LaravelH5p\Http\Controllers\EmbedController')->name('h5p.embed');
         Route::get('h5p/export/{id}', 'Djoudi\LaravelH5p\Http\Controllers\DownloadController')->name('h5p.export');

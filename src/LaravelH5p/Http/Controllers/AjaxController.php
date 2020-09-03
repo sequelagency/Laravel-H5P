@@ -2,6 +2,7 @@
 
 namespace Djoudi\LaravelH5p\Http\Controllers;
 
+use DB;
 use App\Http\Controllers\Controller;
 use Djoudi\LaravelH5p\Events\H5pEvent;
 use Djoudi\LaravelH5p\LaravelH5p;
@@ -69,6 +70,21 @@ class AjaxController extends Controller
         $h5p = App::make('LaravelH5p');
         $editor = $h5p::$h5peditor;
         $editor->ajax->action(H5PEditorEndpoints::FILES, $request->get('_token'), $request->get('contentId'));
+    }
+
+    public function getTranslations(Request $request){
+        $res = [];
+        $language = $request->language;
+        $lib = str_replace(' ', '.',$request->libraries[0]);
+        $lib = explode(".", $lib);
+        $library = DB::select('SELECT hl.id FROM h5p_libraries hl WHERE hl.name = ? AND hl.major_version = ? AND hl.minor_version = ?', [$lib[0].'.'.$lib[1], $lib[2], $lib[3]]);
+        $library_id = $library[0]->id;
+
+        $contents = DB::select('SELECT hll.translation FROM h5p_libraries_languages hll WHERE hll.library_id = ? AND hll.language_code = ?', [$library_id, $language]);
+        $translation = $contents[0]->translation;
+
+        $res['data'][$request->libraries[0]][] = $translation;
+        return $res;
     }
 
     public function __invoke(Request $request)
@@ -212,7 +228,7 @@ class AjaxController extends Controller
                         $json = json_decode($contents);
                         if(isset($json->interactiveVideo)){
                             foreach($json->interactiveVideo->assets->interactions as $interaction){
-                                if($interaction->libraryTitle == 'Multiple Choice'){
+                                if(isset($interaction->libraryTitle) && $interaction->libraryTitle == 'Multiple Choice'){
                                     $interaction->action->subContentId;
     
                                     $child = \Djoudi\LaravelH5p\Eloquents\H5pResult::firstOrCreate(['content_id' => $h5p_id, 'subcontent_id' => $interaction->action->subContentId, 'user_id' => $user_id], ['opened'=>now(), 'score'=>0, 'max_score'=>1]);
