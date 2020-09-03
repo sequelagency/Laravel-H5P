@@ -2,7 +2,7 @@
 
 namespace Djoudi\LaravelH5p\Http\Controllers;
 
-use DB;
+use DB;
 use App\Http\Controllers\Controller;
 use Djoudi\LaravelH5p\Events\H5pEvent;
 use Djoudi\LaravelH5p\LaravelH5p;
