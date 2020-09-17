@@ -172,7 +172,7 @@ class AjaxController extends Controller
             $previous_result = \Djoudi\LaravelH5p\Eloquents\H5pResult::where('content_id', $h5p_id)->where('subcontent_id', $h5p_id_subc)->where('user_id', $user_id)->first();
 
             $finished = false;
-            if (/*$request->input('verb.id') == "http://adlnet.gov/expapi/verbs/answered" ||*/ $request->input('verb.id') == "http://adlnet.gov/expapi/verbs/completed") {
+            if ($request->input('verb.id') == "http://adlnet.gov/expapi/verbs/answered" || $request->input('verb.id') == "http://adlnet.gov/expapi/verbs/completed") {
                 $finished = true;
               
             }
