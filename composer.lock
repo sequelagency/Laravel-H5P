@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "1d5928f784700f357dd3e685d25b4d7d",
+    "content-hash": "bb8d99cf50053773524649208c91f72d",
     "packages": [
         {
             "name": "doctrine/inflector",
@@ -482,16 +482,16 @@
         },
         {
             "name": "h5p/h5p-core",
-            "version": "1.23.1",
+            "version": "1.24.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/h5p/h5p-php-library.git",
-                "reference": "7bc8666f309220a0eb93bca49aaa741bb013b26a"
+                "reference": "55b04018d7def8d2288b768adbcb3cc152fdbd53"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/h5p/h5p-php-library/zipball/7bc8666f309220a0eb93bca49aaa741bb013b26a",
-                "reference": "7bc8666f309220a0eb93bca49aaa741bb013b26a",
+                "url": "https://api.github.com/repos/h5p/h5p-php-library/zipball/55b04018d7def8d2288b768adbcb3cc152fdbd53",
+                "reference": "55b04018d7def8d2288b768adbcb3cc152fdbd53",
                 "shasum": ""
             },
             "require": {
@@ -515,15 +515,15 @@
             "authors": [
                 {
                     "name": "Svein-Tore Griff With",
-                    "role": "CEO",
                     "email": "with@joubel.com",
-                    "homepage": "http://joubel.com"
+                    "homepage": "http://joubel.com",
+                    "role": "CEO"
                 },
                 {
                     "name": "Frode Petterson",
-                    "role": "Developer",
                     "email": "frode.petterson@joubel.com",
-                    "homepage": "http://joubel.com"
+                    "homepage": "http://joubel.com",
+                    "role": "Developer"
                 }
             ],
             "description": "H5P Core functionality in PHP",
@@ -535,20 +535,20 @@
                 "interactive",
                 "quiz"
             ],
-            "time": "2019-08-15T19:15:55+00:00"
+            "time": "2019-10-30T10:42:15+00:00"
         },
         {
             "name": "h5p/h5p-editor",
-            "version": "1.23.1",
+            "version": "1.24.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/h5p/h5p-editor-php-library.git",
-                "reference": "7fc23cda93ae4225320f4903017c67e8f4294157"
+                "reference": "9361892a22ac6ab91e010e0b8a0a0e836f45a16a"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/h5p/h5p-editor-php-library/zipball/7fc23cda93ae4225320f4903017c67e8f4294157",
-                "reference": "7fc23cda93ae4225320f4903017c67e8f4294157",
+                "url": "https://api.github.com/repos/h5p/h5p-editor-php-library/zipball/9361892a22ac6ab91e010e0b8a0a0e836f45a16a",
+                "reference": "9361892a22ac6ab91e010e0b8a0a0e836f45a16a",
                 "shasum": ""
             },
             "require": {
@@ -571,15 +571,15 @@
             "authors": [
                 {
                     "name": "Svein-Tore Griff With",
-                    "role": "CEO",
                     "email": "with@joubel.com",
-                    "homepage": "http://joubel.com"
+                    "homepage": "http://joubel.com",
+                    "role": "CEO"
                 },
                 {
                     "name": "Frode Petterson",
-                    "role": "Developer",
                     "email": "frode.petterson@joubel.com",
-                    "homepage": "http://joubel.com"
+                    "homepage": "http://joubel.com",
+                    "role": "Developer"
                 }
             ],
             "description": "H5P Editor functionality in PHP",
@@ -592,7 +592,7 @@
                 "interactive",
                 "quiz"
             ],
-            "time": "2019-08-16T08:05:14+00:00"
+            "time": "2019-10-30T14:56:53+00:00"
         },
         {
             "name": "laravel/framework",
@@ -1488,17 +1488,17 @@
             ],
             "authors": [
                 {
+                    "name": "Ben Ramsey",
+                    "email": "ben@benramsey.com",
+                    "homepage": "https://benramsey.com"
+                },
+                {
                     "name": "Marijn Huizendveld",
                     "email": "marijn.huizendveld@gmail.com"
                 },
                 {
                     "name": "Thibaud Fabre",
                     "email": "thibaud@aztech.io"
-                },
-                {
-                    "name": "Ben Ramsey",
-                    "email": "ben@benramsey.com",
-                    "homepage": "https://benramsey.com"
                 }
             ],
             "description": "Formerly rhumsaa/uuid. A PHP 5.4+ library for generating RFC 4122 version 1, 3, 4, and 5 universally unique identifiers (UUID).",
@@ -4101,6 +4101,7 @@
             "keywords": [
                 "tokenizer"
             ],
+            "abandoned": true,
             "time": "2019-07-25T05:29:42+00:00"
         },
         {
@@ -4174,8 +4175,8 @@
             "authors": [
                 {
                     "name": "Sebastian Bergmann",
-                    "role": "lead",
-                    "email": "sebastian@phpunit.de"
+                    "email": "sebastian@phpunit.de",
+                    "role": "lead"
                 }
             ],
             "description": "The PHP Unit Testing framework.",
