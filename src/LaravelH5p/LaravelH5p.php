@@ -223,12 +223,12 @@ class LaravelH5p
     {
         $settings = [
             'baseUrl'            => config('laravel-h5p.domain'),
-            'url'                => config('laravel-h5p.domain').'/api/h5p_protect?'.(Auth::check() ? 'token='.auth()->claims(['referer' => app('Illuminate\Routing\UrlGenerator')->previous()])->tokenById(Auth::id()).'&' : '').'data=',//self::get_h5p_storage(), // for uploaded
+            'url'                => self::get_h5p_storage(),//, // for uploaded
             'postUserStatistics' => (config('laravel-h5p.h5p_track_user', true) === '1') && Auth::check(),
             'ajax'               => [
-                'setFinished'     => route('h5p.ajax.finish').(Auth::check() ? '?token='.auth()->claims(['referer' => app('Illuminate\Routing\UrlGenerator')->previous()])->tokenById(Auth::id()) : ''),
+                'setFinished'     => route('h5p.ajax.finish'),
                 //'contentUserData' => route('h5p.ajax.content-user-data'),
-                 'contentUserData' => route('h5p.ajax.content-user-data').'?content_id=:contentId&data_type=:dataType&sub_content_id=:subContentId'.(Auth::check() ? '&token='.auth()->claims(['referer' => app('Illuminate\Routing\UrlGenerator')->previous()])->tokenById(Auth::id()) : ''),
+                'contentUserData' => route('h5p.ajax.content-user-data').'?content_id=:contentId&data_type=:dataType&sub_content_id=:subContentId',
             ],
             'saveFreq' => config('laravel-h5p.h5p_save_content_state', false) ? config('laravel-h5p.h5p_save_content_frequency', 30) : false,
             'siteUrl'  => config('laravel-h5p.domain'),
@@ -540,10 +540,10 @@ class LaravelH5p
                         throw new H5PException('No such library');
                     }
                     //old
-                // $content['params'] = $request->get('parameters');
-                // $params = json_decode($content['params']);
-                    
-                    
+                    // $content['params'] = $request->get('parameters');
+                    // $params = json_decode($content['params']);
+
+
                     //new
                     $params = json_decode($request->get('parameters'));
                     $content['params'] = json_encode($params->params);
@@ -580,7 +580,7 @@ class LaravelH5p
             } catch (H5PException $ex) {
                 return 0;
             }
-        
+
         } else {
             return 0;
         }
@@ -621,7 +621,7 @@ class LaravelH5p
                     //old
                     //$content['params'] = $request->get('parameters');
                     //$params = json_decode($content['params']);
-                    
+
                     //new
                     $params = json_decode($request->get('parameters'));
                     $content['params'] = json_encode($params->params);

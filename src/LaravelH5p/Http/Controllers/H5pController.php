@@ -349,7 +349,7 @@ class H5pController extends Controller
         }
 
         // Move so core can validate the file extension.
-        rename($_FILES['h5p_file']['tmp_name'], $interface->getUploadedH5pPath());
+        rename(request()->file('h5p_file')->getPathName(), $interface->getUploadedH5pPath());
 
         $skipContent = ($content === null);
 

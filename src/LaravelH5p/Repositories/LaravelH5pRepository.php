@@ -613,6 +613,8 @@ class LaravelH5pRepository implements H5PFrameworkInterface
 
         if (isset($content['metadata'])) {
             $content['metadata'] = json_decode($content['metadata']);
+        } else {
+            $content['metadata'] = [];
         }
 
         return $content;

@@ -25,7 +25,7 @@ class MigrationCommand extends Command
      *
      * @return void
      */
-    public function fire()
+    public function handle()
     {
         $this->line('');
         $this->info('Laravel-H5p Creating migration...');

@@ -214,7 +214,7 @@ class LibraryController extends Controller
 
     private function assets($scripts = [], $styles = [])
     {
-        $prefix = 'assets/vendor/h5p/h5p-core/';
+        $prefix = 'vendor/h5p/h5p-core/';
         $return = [
             'scripts' => [],
             'styles'  => [],

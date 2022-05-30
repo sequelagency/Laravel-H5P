@@ -49,6 +49,6 @@
 {{ Html::script($script) }}
 @endforeach
 
-<script src="/storage/laravel-h5p/js/laravel-h5p-result.js"></script>
+<script src="{{ \Djoudi\LaravelH5p\LaravelH5p::get_laravelh5p_url('/js/laravel-h5p-result.js') }}"></script>
 
 @endpush

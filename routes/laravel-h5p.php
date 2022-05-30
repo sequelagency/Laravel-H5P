@@ -38,7 +38,7 @@ Route::group(['middleware' => ['web']], function () {
 
 
 Route::prefix('api')->group(function () {
-    Route::group(['middleware' => ['api']], function () { 
+    Route::group(['middleware' => ['web']], function () {
 
         Route::get('h5p/dom/{id?}', '\Djoudi\LaravelH5p\Http\Controllers\AjaxController@dom')->name('h5p.dom');
 
@@ -61,9 +61,7 @@ Route::prefix('api')->group(function () {
         Route::get('h5p/embed/{id}', 'Djoudi\LaravelH5p\Http\Controllers\EmbedController')->name('h5p.embed');
         Route::get('h5p/export/{id}', 'Djoudi\LaravelH5p\Http\Controllers\DownloadController')->name('h5p.export');
 
-        Route::group(['middleware' => 'auth:api'], function(){
-            Route::post('ajax/finish', 'Djoudi\LaravelH5p\Http\Controllers\AjaxController@finish')->name('h5p.ajax.finish');
-        });
+        Route::post('ajax/finish', 'Djoudi\LaravelH5p\Http\Controllers\AjaxController@finish')->name('h5p.ajax.finish');
 
         Route::get('library', "Djoudi\LaravelH5p\Http\Controllers\LibraryController@index")->name('h5p.library.index');
             Route::get('library/show/{id}', "Djoudi\LaravelH5p\Http\Controllers\LibraryController@show")->name('h5p.library.show');

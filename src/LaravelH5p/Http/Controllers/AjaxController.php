@@ -169,7 +169,7 @@ class AjaxController extends Controller
             $h5p_id = $h5p_ids_parts[0];
             $h5p_id_subc = isset($h5p_ids_parts[1]) ? $h5p_ids_parts[1] : null;
 
-            $previous_result = \Djoudi\LaravelH5p\Eloquents\H5pResult::where('content_id', $h5p_id)->where('subcontent_id', $h5p_id_subc)->where('user_id', $user_id)->first();
+            $previous_result = \Djoudi\LaravelH5p\Eloquents\H5pResult::where('content_id', $h5p_id)->where('subcontent_id', $h5p_id_subc)->where('user_id', $user_id)->whereDate('created_at', now())->first();
 
             $finished = false;
             if ($request->input('verb.id') == "http://adlnet.gov/expapi/verbs/answered" || $request->input('verb.id') == "http://adlnet.gov/expapi/verbs/completed") {
@@ -189,7 +189,7 @@ class AjaxController extends Controller
                 'max_score' => $request->has('result.score.max') ? $request->input('result.score.max') : 0,
                 'opened' => $previous_result ? $previous_result->opened : now(),
                 'finished' => $finished ? now() : null,
-                'time' => round(str_replace(['PT', 'S'], '', $request->input('result.duration'))),
+                'time' => round(floatval(str_replace(['PT', 'S'], '', $request->input('result.duration')))),
                 'description' => $request->has('object.definition.description') ? json_encode($request->input('object.definition.description')) : ($request->has('object.definition.name') ? json_encode($request->input('object.definition.name') ): null),
                 'correct_responses_pattern' => $request->has('object.definition.correctResponsesPattern') ? json_encode($request->input('object.definition.correctResponsesPattern')) : null,
                 'response' => $request->has('result.response') ? json_encode($request->input('result.response')) : null,
@@ -199,10 +199,6 @@ class AjaxController extends Controller
                 'activity_id' => $activity_id,
                 'completion' => $finished ? 100 : 0
             ];
-			
-			if((int)$result['time'] == 0){//ne pas reset le temps deja pris en compte
-				unset($result['time']);
-			}
 				
 
             if ($previous_result) {//maj

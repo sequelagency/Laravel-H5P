@@ -8,12 +8,17 @@
  *
  */
 (function ($) {
-    
+
+    var _document = document;
+    if (window.parent) {
+        _document = window.parent.document;
+    }
+
     // setting for inside editor
     $.ajaxSetup({
-        /*headers: {
-            'X-CSRF-TOKEN': window.parent.Laravel.csrfToken
-        },*/
+        headers: {
+            'X-CSRF-TOKEN': $('meta[name="csrf-token"]', _document).attr('content'),
+        },
         dataType: 'json',
     });
 
