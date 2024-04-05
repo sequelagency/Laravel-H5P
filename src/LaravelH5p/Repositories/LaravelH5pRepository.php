@@ -1043,4 +1043,50 @@ class LaravelH5pRepository implements H5PFrameworkInterface
             );
         }
     }
+
+    /**
+     * Replace content hub metadata cache
+     *
+     * @param JsonSerializable $metadata Metadata as received from content hub
+     * @param string $lang Language in ISO 639-1
+     *
+     * @return mixed
+     */
+    public function replaceContentHubMetadataCache($metadata, $lang) {
+        // TODO
+    }
+
+    /**
+     * Get content hub metadata cache from db
+     *
+     * @param  string  $lang Language code in ISO 639-1
+     *
+     * @return JsonSerializable Json string
+     */
+    public function getContentHubMetadataCache($lang = 'en') {
+        return json_encode([]);
+    }
+
+    /**
+     * Get time of last content hub metadata check
+     *
+     * @param  string  $lang Language code iin ISO 639-1 format
+     *
+     * @return string|null Time in RFC7231 format
+     */
+    public function getContentHubMetadataChecked($lang = 'en') {
+        return now()->format(\DateTimeInterface::RFC7231);
+    }
+
+    /**
+     * Set time of last content hub metadata check
+     *
+     * @param  int|null  $time Time in RFC7231 format
+     * @param  string  $lang Language code iin ISO 639-1 format
+     *
+     * @return bool True if successful
+     */
+    public function setContentHubMetadataChecked($time, $lang = 'en') {
+        return true;
+    }
 }
