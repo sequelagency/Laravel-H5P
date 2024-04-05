@@ -775,7 +775,7 @@ class LaravelH5pRepository implements H5PFrameworkInterface
     /**
      * Implements fetchExternalData.
      */
-    public function fetchExternalData($url, $data = null, $blocking = true, $stream = null)
+    public function fetchExternalData($url, $data = null, $blocking = true, $stream = null, $fullData = false, $headers = [], $files = [], $method = 'POST')
     {
         @set_time_limit(0);
         $options = [
@@ -790,17 +790,17 @@ class LaravelH5pRepository implements H5PFrameworkInterface
             if ($data !== null) {
                 // Post
                 $options['body'] = $data;
-                $response = $client->request('POST', $url, ['form_params' => $options]);
+                $response = $client->request($method, $url, ['form_params' => $options]);
             } else {
                 // Get
                 if (empty($options['filename'])) {
                     // Support redirects
                     //                $response = wp_remote_get($url);
-                    $response = $client->request('GET', $url);
+                    $response = $client->request($method, $url);
                 } else {
                     // Use safe when downloading files
                     //                $response = wp_safe_remote_get($url, $options);
-                    $response = $client->request('GET', $url, $options);
+                    $response = $client->request($method, $url, $options);
                 }
             }
 
